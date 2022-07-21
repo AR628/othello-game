@@ -84,7 +84,7 @@ public class OGameBoard extends JPanel {
         o.reset();
         status.setText("Player 1's Turn");
         blackCounter.setText("Player 1 (Black): " + 2);
-        whiteCounter.setText("Player 2 (White): " + 2);
+        whiteCounter.setText("Player 2 (White / AI): " + 2);
         repaint();
 
         // Makes sure this component has keyboard/mouse focus
@@ -102,7 +102,7 @@ public class OGameBoard extends JPanel {
         }
 
         blackCounter.setText("Player 1 (Black): " + o.getBlackPieces());
-        whiteCounter.setText("Player 2 (White): " + o.getWhitePieces());
+        whiteCounter.setText("Player 2 (White / AI): " + o.getWhitePieces());
 
         int winner = o.checkWinner();
         if (winner == 1) {

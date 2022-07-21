@@ -66,7 +66,6 @@ public class Othello {
             return new Object[]{true, null};
         } else {
             int[] newMove = minimax(board, possibleMoves, player1, pieces2 - pieces1, 10 * r + c, 10, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            System.out.println((int) newMove[1] / 10 + "" + (int) newMove[1] % 10);
             playTurn((int) newMove[1] / 10, (int) newMove[1] % 10);
             return new Object[]{true, newMove[1]};
         } 

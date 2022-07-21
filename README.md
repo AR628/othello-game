@@ -1,7 +1,7 @@
 # Othello Project
-A fully-functioning Othello, where two users can play this turn-by-turn game and save their game state at any time. Built solely using Java and its Swing library. This was my final project in my *CIS 120: Programming Languages & Techniques* class.
+A fully-functioning Othello, where a user can play Othello against an AI agent using the minimax algorithm and alpha-beta pruning. Built solely using Java and its Swing library. An earlier version of this project was built for my *CIS 120: Programming Languages & Techniques* class; I then added the AI mode afterwards. 
 
-![Screenshot of project](https://user-images.githubusercontent.com/36567631/169464193-4750ea9a-da18-421c-bbbe-a77567ebdee2.png)
+<img width="795" alt="image" src="https://user-images.githubusercontent.com/36567631/180250212-01fe762a-092a-49c8-a846-376816c3ebb2.png">
 
 ## How to Run
 1. Clone this repository.
@@ -10,7 +10,7 @@ A fully-functioning Othello, where two users can play this turn-by-turn game and
 ## Project Layout
 This project uses a Model-View Controller layout. 
 ![Visual description of MVC](https://developer.mozilla.org/en-US/docs/Glossary/MVC/model-view-controller-light-blue.png)
-* Model: [Othello.java](Othello.java), which stores the internal game state using a 2D array.
+* Model: [Othello.java](Othello.java), which stores the internal game state using a 2D array, and has the AI agent.
 * View: [RunOthello.java](RunOthello.java), which displays the game on the user's screen.
 * Controller: [OGameBoard.java](OGameBoard.java), which sets listeners for when the user clicks a square or a button.
 
