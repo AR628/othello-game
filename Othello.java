@@ -1,7 +1,6 @@
 import java.util.*;
 
 public class Othello {
-
     private int[][] board;
     private int numTurns;
     private boolean player1;
@@ -28,9 +27,9 @@ public class Othello {
      * @param r row to play in
      * @return whether the turn was successful
      */
-    public boolean playTurn(int r, int c) { 
+    public Object[] playTurn(int r, int c) { 
         if (!possibleMoves.containsKey(10 * r + c) || gameOver) {
-            return false;
+            return new Object[]{false};
         }
         Set<Integer> flipped = possibleMoves.get(10 * r + c);
         for (Integer i : flipped) {
@@ -63,7 +62,225 @@ public class Othello {
                 gameOver = true;
             }
         }
-        return true;
+        if (player1 || gameOver) {
+            return new Object[]{true, null};
+        } else {
+            int[] newMove = minimax(board, possibleMoves, player1, pieces2 - pieces1, 10 * r + c, 10, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            System.out.println((int) newMove[1] / 10 + "" + (int) newMove[1] % 10);
+            playTurn((int) newMove[1] / 10, (int) newMove[1] % 10);
+            return new Object[]{true, newMove[1]};
+        } 
+    }
+
+    public int[] minimax(int[][] boardCopy, Map<Integer, Set<Integer>> possibleMovesCopy, boolean player1Copy, int diff, int currMove, int depth, int alpha, int beta) {
+        if (depth == 0) {
+            return new int[]{diff, currMove};
+        }
+        if (possibleMovesCopy.size() == 0) {
+            if (diff > 0) {
+                return new int[]{Integer.MAX_VALUE - 1, currMove};
+            } else {
+                return new int[]{Integer.MIN_VALUE + 1, currMove};
+            }
+        }
+
+        if (!player1Copy) {
+            int maxEval = Integer.MIN_VALUE;
+            int bestMove = -2;
+            for (int move: possibleMovesCopy.keySet()) {
+                int[][] boardCopy2 = new int[8][8];
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 8; j++) {
+                        boardCopy2[i][j] = boardCopy[i][j];
+                    }
+                }
+    
+                for (int flipped: possibleMovesCopy.get(move)) {
+                    int rVal = flipped / 10;
+                    int cVal = flipped % 10;
+                    boardCopy2[rVal][cVal] = 2;
+                }
+    
+                Map<Integer, Set<Integer>> possibleMovesCopy2 = getMovesForMinimax(boardCopy2, player1Copy);
+                int[] res = minimax(boardCopy2, possibleMovesCopy2, !player1Copy, diff + 2 * possibleMovesCopy.get(move).size() + 1, move, depth - 1, alpha, beta);
+                if (res[0] > maxEval) {
+                    maxEval = res[0];
+                    bestMove = move;
+                }
+                alpha = Math.max(alpha, maxEval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+
+            return new int[]{maxEval, bestMove};
+
+        } else {
+            int minEval = Integer.MAX_VALUE;
+            int bestMove = -2;
+            for (int move: possibleMovesCopy.keySet()) {
+                int[][] boardCopy2 = boardCopy.clone();
+
+                for (int flipped: possibleMovesCopy.get(move)) {
+                    int rVal = flipped / 10;
+                    int cVal = flipped % 10;
+                    boardCopy2[rVal][cVal] = 1;
+                }
+
+                Map<Integer, Set<Integer>> possibleMovesCopy2 = getMovesForMinimax(boardCopy2, player1Copy);
+                int[] res = minimax(boardCopy2, possibleMovesCopy2, !player1Copy, diff - 2 * possibleMovesCopy.get(move).size() - 1, move, depth - 1, alpha, beta);
+                if (res[0] < minEval) {
+                    minEval = res[0];
+                    bestMove = move;
+                }
+                beta = Math.min(beta, minEval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+
+            return new int[]{minEval, bestMove};
+        }
+    }
+
+    public Map<Integer, Set<Integer>> getMovesForMinimax(int[][] theBoard, boolean currPlayer) {
+        Map<Integer, Set<Integer>> possibleMovesCopy2 = new TreeMap<>();
+        for (int i = 0; i < theBoard.length; i++) {
+            for (int j = 0; j < theBoard[0].length; j++) {
+                if (theBoard[i][j] > 0) {
+                    continue;
+                }
+
+                Set<Integer> piecesThatChange = new TreeSet<>();
+                int otherSide;
+                if (currPlayer) {
+                    otherSide = 1;
+                } else {
+                    otherSide = 2;
+                }
+
+                int newi;
+                int newj;
+                Set<Integer> oneD;
+                if (i > 0 && theBoard[i - 1][j] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i - 1;
+                    while (newi >= 0 && theBoard[newi][j] == otherSide) {
+                        oneD.add(10 * newi + j);
+                        newi -= 1;
+                    }
+
+                    if (newi >= 0 && theBoard[newi][j] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (i < theBoard.length - 1 && theBoard[i + 1][j] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i + 1;
+                    while (newi <= theBoard.length - 1 && theBoard[newi][j] == otherSide) {
+                        oneD.add(10 * newi + j);
+                        newi += 1;
+                    }
+
+                    if (newi <= theBoard.length - 1 && theBoard[newi][j] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (j > 0 && theBoard[i][j - 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newj = j - 1;
+                    while (newj >= 0 && theBoard[i][newj] == otherSide) {
+                        oneD.add(10 * i + newj);
+                        newj -= 1;
+                    }
+
+                    if (newj >= 0 && theBoard[i][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (j < theBoard[0].length - 1 && theBoard[i][j + 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newj = j + 1;
+                    while (newj <= theBoard[0].length - 1 && theBoard[i][newj] == otherSide) {
+                        oneD.add(10 * i + newj);
+                        newj += 1;
+                    }
+
+                    if (newj <= theBoard.length - 1 && theBoard[i][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+
+                if (i > 0 && j > 0 && theBoard[i - 1][j - 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i - 1;
+                    newj = j - 1;
+                    while (newi >= 0 && newj >= 0 && theBoard[newi][newj] == otherSide) {
+                        oneD.add(10 * newi + newj);
+                        newi -= 1;
+                        newj -= 1;
+                    }
+
+                    if (newi >= 0 && newj >= 0 && theBoard[newi][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (i > 0 && j < theBoard[0].length - 1 && theBoard[i - 1][j + 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i - 1;
+                    newj = j + 1;
+                    while (newi >= 0 && newj <= theBoard[0].length - 1
+                            && theBoard[newi][newj] == otherSide) {
+                        oneD.add(10 * newi + newj);
+                        newi -= 1;
+                        newj += 1;
+                    }
+
+                    if (newi >= 0 && newj <= theBoard[0].length - 1
+                            && theBoard[newi][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (i < theBoard.length - 1 && j > 0 && theBoard[i + 1][j - 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i + 1;
+                    newj = j - 1;
+                    while (newi <= theBoard.length - 1 && newj >= 0
+                            && theBoard[newi][newj] == otherSide) {
+                        oneD.add(10 * newi + newj);
+                        newi += 1;
+                        newj -= 1;
+                    }
+
+                    if (newi <= theBoard.length - 1 && newj >= 0
+                            && theBoard[newi][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (i < theBoard.length - 1 && j < theBoard[0].length - 1
+                        && theBoard[i + 1][j + 1] == otherSide) {
+                    oneD = new TreeSet<>();
+                    newi = i + 1;
+                    newj = j + 1;
+                    while (newi <= theBoard.length - 1 && newj <= theBoard[0].length - 1
+                            && theBoard[newi][newj] == otherSide) {
+                        oneD.add(10 * newi + newj);
+                        newi += 1;
+                        newj += 1;
+                    }
+
+                    if (newi <= theBoard.length - 1 && newj <= theBoard[0].length - 1
+                            && theBoard[newi][newj] == (3 - otherSide)) {
+                        piecesThatChange.addAll(oneD);
+                    }
+                }
+                if (!piecesThatChange.isEmpty()) {
+                    possibleMovesCopy2.put(10 * i + j, piecesThatChange);
+                }
+            }
+        
+        }
+        return possibleMovesCopy2;
     }
 
     /**

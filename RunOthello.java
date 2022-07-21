@@ -18,14 +18,16 @@ public class RunOthello implements Runnable {
 
         // Game board
         final JLabel blackCount = new JLabel("Player 1 (Black): " + 2);
-        final JLabel whiteCount = new JLabel("Player 2 (White): " + 2);
+        final JLabel whiteCount = new JLabel("Player 2 (White // AI): " + 2);
         final JButton instructions = new JButton("Instructions");
 
         String instructMessage = "<html><br>Hello! This game is Othello. " +
                 "The exact rules can be found here: https://www.fgbradleys.com/rules/Othello.pdf."
                 +
                 "<br>Black goes first, as is standard. " +
-                "During a turn, each player clicks on the next square they want their piece to go."
+                "During a turn, black clicks on the next square they want their piece to go."
+                +
+                "<br>White, which is an AI that uses the minimax algorithm, will then move."
                 +
                 "<br>The board will update accordingly, and any invalid moves won't be registered. "
                 +

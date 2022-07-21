@@ -5,7 +5,6 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class OGameBoard extends JPanel {
-
     private Othello o; // model for the game
     private JLabel status; // current status text
     private JLabel blackCounter;
@@ -51,8 +50,8 @@ public class OGameBoard extends JPanel {
                 Point p = e.getPoint();
 
                 // updates the model given the coordinates of the mouseclick
-                boolean successful = o.playTurn(p.y / 100, p.x / 100);
-                if (successful) {
+                Object[] res = o.playTurn(p.y / 100, p.x / 100);
+                if ((boolean) res[0]) {
                     try {
                         fw.write(p.y / 100 + "" + p.x / 100 + "\n");
                         fw.flush();
